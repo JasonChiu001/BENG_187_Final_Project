@@ -38,6 +38,7 @@ An important property of LD is that it is typically population dependent. Differ
 ![unnamed (1)](https://github.com/user-attachments/assets/0a053dc6-31b7-4a34-8e05-31953c18ce31)
 
 Figure 2. LD matrix for different cohorts. [8]
+
 YRI is Yoruba, CEU is Europeans, and CHB + JPT is Chinese and Japanese respectively. 
 
 ### 2.1 Generating eQTLS
