@@ -1,6 +1,6 @@
 # Expression Quantitative Trait Loci (eQTL): Bridging Genotype and Phenotype
 
-## 1. Introduction to eQTLs ##
+## 1. Introduction to eQTLs
 
 	With the emergence of Genome Wide Association Studies (GWAS) in recent years, scientists have identified thousands of single nucleotide polymorphisms (SNPs) associated with complex diseases [1]. Despite this method being able to pinpoint potential risk loci that could explain these traits, the underlying mechanisms remain unavailable due to the majority of effects residing in non-coding regions of the genome [2], as well as the presence of pleiotropy and linkage [3]. A way to target the problem of discovery of causal variants behind these traits lies in leveraging Expression Quantitative Trait Loci (eQTLs). Briefly, eQTLs are genomic loci where variants influence the expression levels of one or more genes, providing a direct connection between genetic variation and transcriptional regulation. By directly linking genetic variants to changes in gene expression levels, eQTLs represent a powerful approach for understanding how genetic variation influences gene expression. In the era of genomics, eQTLs serve as crucial tools for bridging the gap between genetic variants and their functional impacts on cellular processes. 
 
