@@ -13,7 +13,7 @@ eQTLs are genomic regions that contain sequence variants (typically SNPs) that i
 
 ### 1.2 Linkage Disequilibrium
 
-## 1.2.1 Linkage & Recombination
+#### 1.2.1 Linkage & Recombination
 
 Recombination is a process in which DNA is broken and recombined to form a haplotype structure that could not exist otherwise. In eukaryotic cells, recombination usually takes place during meiosis [4]. 
 
@@ -21,7 +21,7 @@ Linkage is the idea that sites that are closer together in the genome typically 
 
 The important thing to understand is that linkage propagates linkage disequilibrium (LD), that is, the nonrandom combination of alleles. On the other hand, recombination breaks down LD.
 
-## 1.2.2 Linkage Disequilibrium (LD)
+#### 1.2.2 Linkage Disequilibrium (LD)
 
 How do we measure LD? 
 
@@ -42,7 +42,7 @@ YRI is Yoruba, CEU is Europeans, and CHB + JPT is Chinese and Japanese respectiv
 
 ### 2.1 Generating eQTLS
 
-## 2.1.1 Data
+#### 2.1.1 Data
 
 To generate an eQTL, you will need expression data in the form of normalized RNA sequencing data. You will also need genotypes either from whole genome sequencing or genotyping arrays. There exist consortiums that have massive amounts of available data like the UK biobank. 
 
@@ -56,7 +56,7 @@ training_gt_pca$rotation[,1:10] +
 training_ge_pca$rotation[,1:10]))
  ```
 
-## 2.1.2 Regression
+#### 2.1.2 Regression
 
 The next step is to regress the expression levels on genotyping data. The regression is a very standard ordinary least squares. You have to compute a regression between every SNP per gene. So, if you have n genes and m SNPs, you will effectively compute nm regressions, each with their unique effect size i.e. the slope.
 
@@ -83,6 +83,7 @@ In recent years, SuSiE (Sum Of Single Effects) [11] has emerged as a powerful al
 ![unnamed (2)](https://github.com/user-attachments/assets/d49db34b-090e-4e59-bc76-8460ced5e029)
 
 Figure 3. Iterative Bayesian Stepwise Selection
+
 Here we show how IBSS works. The central function behind the algorithm is Single Effect Regression (SER), which linearly fits y = Xb + e, where X – genotypes matrix, b – effect vector with 1 SNP, e – is an N-vector of error terms, y – phenotypes of N individuals. The SER function calculates α – posterior inclusion probability (PIP), indicating how likely it is that this single-effect component is nonzero; μ – posterior mean of the effect size; σ – posterior standard deviation of the effect size. Briefly, SER computes PIP by calculating Bayes Factor, which quantifies the strength of evidence in favor of a hypothesis that SNP is causal compared to a null hypothesis (b=0), and then normalizes it across all effects. More detail on how it is achieved is described in the SuSiE’s paper supplementary material [11].
 We now describe how the algorithm works line by line.
 - Line 1, we assume no effects are present. 
@@ -97,45 +98,52 @@ Once the algorithm converges, we get a distribution of PIPs, posterior effects, 
 ![unnamed (3)](https://github.com/user-attachments/assets/16efe23d-c393-42da-a1a4-b2770f58fb02)
 
 Figure 4. IBSS-ss algorithm.
+
 Here XTX – correlation from LD matrix, XTy – SNP-phenotype association (sufficient statistics) that is derived from eQTLs. Conceptually, the algorithm is very similar to IBSS with the only difference being that we compute residuals in ρ that are derived from sufficient statistics rather than individual level data. More on the argument on how sufficient statistics are derived in the SuSiE-RSS [12].
 
 #### 2.2.3 Fine-mapping in practice
 ![unnamed (4)](https://github.com/user-attachments/assets/65575067-e088-4958-a9fb-d5cd127ba20b)
 
 Figure 5. Example of how SuSiE fine-mapping works.
-To understand fine-mapping in practice, we refer to a figure from the SuSiE-RSS paper [13] that illustrates how a refinement step can improve the performance of SuSiE-RSS. Although we do not detail this optional refinement procedure in our algorithm description, it can enhance results when the initial solution is not globally optimal. Regardless, the figure provides an excellent example of how fine-mapping works. In panel 5A, we see a zoomed-in view of a simulated GWAS locus from the UK Biobank dataset. Initially, numerous SNPs are present in the region, but after applying SuSiE-RSS, they are consolidated into a smaller set of putative causal variants (SMA, SNP1, and SNP2). Panels 5B and 5C then show the fine-mapping results in terms of Posterior Inclusion Probabilities (PIPs).
+
+To understand fine-mapping in practice, we refer to a figure from the SuSiE-RSS paper [12] that illustrates how a refinement step can improve the performance of SuSiE-RSS. Although we do not detail this optional refinement procedure in our algorithm description, it can enhance results when the initial solution is not globally optimal. Regardless, the figure provides an excellent example of how fine-mapping works. In panel 5A, we see a zoomed-in view of a simulated GWAS locus from the UK Biobank dataset. Initially, numerous SNPs are present in the region, but after applying SuSiE-RSS, they are consolidated into a smaller set of putative causal variants (SMA, SNP1, and SNP2). Panels 5B and 5C then show the fine-mapping results in terms of Posterior Inclusion Probabilities (PIPs).
 
 ### 2.3 Polygenic Risk Score
 
-## 2.3.1 Introduction to Polygenic Risk Scores
+#### 2.3.1 Introduction to Polygenic Risk Scores
 Polygenic Risk Scores (PRS) represent a powerful approach for translating genetic findings into clinically relevant predictions. While individual genetic variants typically have small effects on complex traits, PRS aggregate these weak signals across many genomic regions to generate meaningful predictions about phenotypes.
-The construction of PRS involves collecting significant SNPs identified through eQTL analysis and weighting these SNPs based on their effect sizes. These weighted effects are then aggregated into a predictive model that can be used to assess individual risk for various traits and conditions.
 
-## 2.3.2 Types and Implementation
-Recent work by Gabriel et al. has demonstrated the effectiveness of multiple PRS approaches. The GWS PRS, using genome-wide significant SNPs, provides a baseline approach utilizing 65 key genetic markers. The eQTL PRS expands this by incorporating 961 expression-related SNPs, offering additional predictive power through the integration of functional genetic information.
-Combined approaches have shown the strongest results, integrating multiple sources while carefully accounting for overlapping SNPs and linkage disequilibrium. This comprehensive method has demonstrated superior predictive capability compared to single-source approaches.
+#### 2.3.2 Implementation Example
+Recent work [13] has demonstrated the effectiveness of multiple PRS approaches. The GWS PRS, using genome-wide significant SNPs, provides a baseline approach utilizing 65 key genetic markers. The eQTL PRS expands this by incorporating 961 expression-related SNPs, offering additional predictive power through the integration of functional genetic information.
+Combined approaches have shown stronger results accounting for overlapping SNPs within genetic loci and linkage disequilibrium.
 
-## 2.3.3 Performance in Clinical Settings
+#### 2.3.3 Performance in Clinical Settings
 
 ![unnamed](https://github.com/user-attachments/assets/edc0bcfe-e7cc-4d5a-b354-08106dc54930)
 
-Figure 6. PRS construction. [14]
+Figure 6. PRS construction. [13]
+
 Studies have shown promising results in PRS applications across different contexts. The GWS PRS achieves an odds ratio of 1.27 (CI: 1.20-1.35, p < 0.001), while the eQTL PRS shows comparable performance with an OR of 1.24 (CI: 1.17-1.32, p < 0.001). Most notably, the combined PRS approach demonstrates enhanced predictive power with an OR of 1.37 (CI: 1.29-1.45, p < 0.001).
+
 These scores have proven particularly valuable in disease risk prediction, ranging from cancer susceptibility to diabetes risk assessment. Their utility extends to identifying high-risk individuals who might benefit from enhanced screening protocols.
 
-## 2.3.4 Current Limitations in Genetic Prediction
+#### 2.3.4 Current Limitations in PRS
 
-In the context of genetic prediction, raw GWAS results alone provide limited utility for predicting complex traits, such as identifying individuals at high risk of developing type 2 diabetes. A PRS addresses this by aggregating weak signals spread across many genomic regions. At its core, a PRS can be viewed as a machine learning task: taking an input x (one's genotype and potentially other variables) and producing an output y (the individual's predicted trait value).
-A recent paper [15] outlines two main approaches to training PRS. The first involves using a sufficiently large cohort of genotyped and phenotyped individuals to train a PRS from scratch using standard machine-learning algorithms on individual-level data. The second, more common approach involves meta-analyzing summary statistics from published GWAS results into a linear model.
-Despite over a decade of refinement with exponentially increasing cohort sizes, the predictive power of most PRS remains limited. While there have been successes with specific phenotypes like height, most diseases and clinically relevant traits fall short of genetics-based risk assessment potential. Current models explain only a small fraction of trait heritability and often don't reach clinical relevance. Notably, the paper points out that many potential reasons for unsatisfying PRS performance are linked to questions of missing heritability and nonlinear genetic effects.
-A significant issue highlighted is PRS transferability between populations and genotyping technologies. The paper notes substantial declines in performance when transferring PRS between datasets, even within the same population. This instability is often attributed to batch effects and differences in genotyping technologies, though the exact reasons for these sensitivities remain poorly understood. Even within the same dataset and ancestry group, prediction accuracy can vary based on characteristics such as sex, age, or socioeconomic status.
-The review discusses attempts to improve PRS using nonlinear models, including support vector machines, random forests, and deep neural networks. However, these attempts have generally failed to outperform simple linear models. This provides strong evidence for the theory that nonlinear effects may not be as important in the grand scheme of things, though the paper notes these findings aren't yet decisive since only a handful of attempts have been made with nonlinear approaches.
+In the context of genetic prediction, raw GWAS results alone provide limited utility for predicting complex traits. A PRS addresses this by aggregating weak signals spread across many genomic regions. At its core, a PRS can be viewed as a machine learning task: taking an input x (one's genotype and potentially other variables) and producing an output y (the individual's predicted trait value).
 
-### Conclusion
+A recent paper [14] outlines two main approaches to training PRS. The first involves using a sufficiently large cohort of genotyped and phenotyped individuals to train a PRS from scratch using standard machine-learning algorithms on individual-level data. The second, more common approach involves meta-analyzing summary statistics from published GWAS results into a linear model.
 
-eQTLs enable anonymous faster fine-mapping via sufficient statistics that can be utilized to find causal SNPs behind the genes. Current implementation of SuSiE has led to development of multi-ancestry fine-mapping methods such as SuSiEx [16], SuShiE [17] to improve fine-mapping for limited data in non-European populations. Additionally, recently a new method RSparsePro [17] emerged to tackle the limitation of SuSiE-RSS associated with allele flips in LD matrices.
+Despite over a decade of refinement with exponentially increasing cohort sizes, the predictive power of most PRS remains limited. While there have been successes with specific phenotypes like height, most diseases and clinically relevant traits fall short of genetics-based risk assessment potential. Current models explain only a small fraction of trait heritability and often don't reach clinical relevance. This happens mainly due to PRS being able to explain heritability only based on cis-genetic expression, while not accounting environment variance and other source of heritability (e.g. nonlinear effects).
 
-### Citations
+The review discusses attempts to improve PRS using nonlinear models, including support vector machines, random forests, and deep neural networks. However, these attempts have generally failed to outperform simple linear models.
+
+## Conclusion
+
+eQTLs have enabled us in a better way to understand the underlying mechanisms behind complex traits by combining wide genotype information with expression data, enabling per variant analysis. This type of analysis empowers scientists to design further downstream wet lab experiments. Thus it is important that these methods are continued to be optimized to best represent biology.
+
+eQTLs enable anonymous faster fine-mapping via sufficient statistics that can be utilized to find causal SNPs behind the genes. Current implementation of SuSiE has led to development of multi-ancestry fine-mapping methods such as SuSiEx [15], SuShiE [16] to improve fine-mapping for limited data in non-European populations. Additionally, recently a new method RSparsePro [17] emerged to tackle the limitation of SuSiE-RSS associated with allele flips in LD matrices.
+
+## Citations
 
 [1] Henriksson, J., Chen, X., Gomes, T., Ullah, U., Meyer, K. B., Miragaia, R., Duddy, G., Pramanik, J., Yusa, K., Lahesmaa, R., & Teichmann, S. A. (2019). Genome-wide CRISPR Screens in T Helper Cells Reveal Pervasive Crosstalk between Activation and Differentiation. Cell, 176(4), 882-896.e18. https://doi.org/10.1016/j.cell.2018.11.044
 
@@ -161,7 +169,7 @@ eQTLs enable anonymous faster fine-mapping via sufficient statistics that can be
 
 [12] Zou, Y., Carbonetto, P., Wang, G., & Stephens, M. (2022). Fine-mapping from summary data with the "Sum of Single Effects" model. PLoS Genetics, 18(7), e1010299. https://doi.org/10.1371/journal.pgen.1010299
 
-[13] Figure 3. Germline polygenic risk score construction using smoking and. . . (n.d.). ResearchGate. https://www.researchgate.net/figure/Germline-polygenic-risk-score-construction-using-smoking-and-eQTL-related-SNPs-and_fig3_360408701
+[13] Gabriel, A. a. G., Atkins, J. R., Penha, R. C. C., Smith-Byrne, K., Gaborieau, V., Voegele, C., Abedi-Ardekani, B., Milojevic, M., Olaso, R., Meyer, V., Boland, A., Deleuze, J. F., Zaridze, D., Mukeriya, A., Swiatkowska, B., Janout, V., Schejbalová, M., Mates, D., Stojšić, J., . . . McKay, J. D. (2022). Genetic analysis of lung cancer and the germline impact on somatic mutation burden. JNCI Journal of the National Cancer Institute, 114(8), 1159–1166. https://doi.org/10.1093/jnci/djac087
 
 [14] Brandes, N., Weissbrod, O., & Linial, M. (2022). Open problems in human trait genetics. Genome Biology, 23(1). https://doi.org/10.1186/s13059-022-02697-9 
 
